@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>认知五层测评与成长系统</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="card-generator.js" defer></script>
+  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header class="hero">
+    <div class="container hero-inner">
+      <div>
+        <p class="eyebrow">认知五层测评</p>
+        <h1>你在哪一层认知？</h1>
+        <p class="lead">3 分钟测试认知层级；10 分钟学会判断流程。</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#assessment">进入测评</a>
+          <button class="btn ghost" id="share-link" type="button">一键分享</button>
+        </div>
+        <p class="micro" id="share-status"></p>
+        <div class="campaign-banner" id="campaign-banner" hidden></div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-title">开始前先想三件事</div>
+        <ul>
+          <li>我正在做哪类关键决策？</li>
+          <li>我当前的判断依据是否完整？</li>
+          <li>我愿意投入多少时间提升认知？</li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="flow" class="section">
+      <div class="container">
+        <h2>用户路径：首页 → 测评 → 结果 → 成长工作台 → 用户档案</h2>
+        <p class="section-lead">围绕五层认知架构，完成评估、训练与记录沉淀。</p>
+        <div class="grid four">
+          <div class="card">
+            <h3>1. Landing Page</h3>
+            <p>明确价值与入口，快速进入测评。</p>
+          </div>
+          <div class="card">
+            <h3>2. 认知层级测评</h3>
+            <p>3–5 分钟完成五层能力评估。</p>
+          </div>
+          <div class="card">
+            <h3>3. 测评结果页</h3>
+            <p>输出层级、标签与高频误判建议。</p>
+          </div>
+          <div class="card">
+            <h3>4. 成长工作台</h3>
+            <p>每日挑战、模型库与跑题器训练。</p>
+          </div>
+          <div class="card">
+            <h3>5. 用户档案</h3>
+            <p>历史测评、跑题记录与成长日志。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="viral" class="section">
+      <div class="container">
+        <h2>增长引擎：邀请传播 + 挑战回流</h2>
+        <p class="section-lead">每次分享都生成带邀请码的链接，好友可直接进入测评并继续扩散。</p>
+        <div class="grid two">
+          <div class="card">
+            <h3>你的专属邀请入口</h3>
+            <div class="invite-code" id="invite-code">-</div>
+            <label class="input-group">
+              <span>邀请链接</span>
+              <input id="invite-url" type="text" readonly />
+            </label>
+            <div class="quiz-actions">
+              <button class="btn primary" type="button" id="copy-invite-link">复制邀请链接</button>
+              <button class="btn ghost" type="button" id="copy-invite-text">复制挑战文案</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>传播进度</h3>
+            <p class="micro" id="backend-status">后端状态：检测中</p>
+            <div class="kpi-grid">
+              <div class="kpi">
+                <div class="kpi-label">分享动作</div>
+                <div class="kpi-value" id="growth-share-count">0</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">增长分</div>
+                <div class="kpi-value" id="growth-score">0</div>
+              </div>
+            </div>
+            <div class="growth-track">
+              <div class="growth-fill" id="growth-progress"></div>
+            </div>
+            <p class="micro" id="growth-level-text"></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>传播排行榜（Top 10）</h3>
+          <div class="log-list" id="leaderboard-list"></div>
+          <div class="quiz-actions">
+            <button class="btn ghost" type="button" id="refresh-leaderboard">刷新排行</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="assessment" class="section soft">
+      <div class="container">
+        <h2>认知层级测评（3–5 分钟）</h2>
+        <p class="section-lead">12 题情境题，评估五层认知能力。</p>
+        <div class="card assessment-container">
+          <div class="assessment-head">
+            <div class="progress-container">
+              <div class="progress-bar" id="assessment-progress-bar"></div>
+            </div>
+            <div id="assessment-progress-text">1/12</div>
+            <button class="btn ghost small" id="assessment-reset" type="button">重置</button>
+          </div>
+          <div id="question-container" class="question-container">
+            <!-- Dynamic Question Content -->
+          </div>
+          <form id="assessment-form" class="question-list" hidden></form>
+          <div class="quiz-actions">
+            <button class="btn primary" type="submit" form="assessment-form">提交并生成结果</button>
+            <button class="btn ghost" type="button" id="share-result">分享我的画像</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="result" class="section">
+      <div class="container">
+        <h2>测评结果（可分享）</h2>
+        <p class="section-lead">层级分布、标签与误判场景建议。</p>
+        <div class="card">
+          <div id="result-summary" class="result"></div>
+          <div class="chart-container">
+            <canvas id="radarChart"></canvas>
+          </div>
+          <div class="bars" id="result-bars" hidden></div>
+          <div class="grid three" id="result-tags"></div>
+          <div class="result-actions">
+            <button class="btn primary" type="button" id="generate-share-card">生成分享图</button>
+            <a class="btn ghost" id="download-share-card" href="#" download="cognitive-share-card.png">下载分享图</a>
+          </div>
+          <div class="share-card" id="share-card">
+            <img id="share-card-image" alt="分享图预览" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="growth" class="section soft">
+      <div class="container">
+        <h2>认知成长工作台</h2>
+        <p class="section-lead">每日练题、模型复用与结构化跑题流程。</p>
+        <div class="grid two">
+          <div class="card">
+            <h3>每日认知挑战</h3>
+            <p class="section-lead">每天 1 个真实情境练题，完成后可保存记录。</p>
+            <div class="result" id="daily-challenge"></div>
+            <div class="quiz-actions">
+              <button class="btn primary" type="button" id="refresh-challenge">刷新挑战</button>
+              <button class="btn ghost" type="button" id="save-challenge">保存到日志</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>模型卡片库</h3>
+            <p class="section-lead">核心模型可快速复用。</p>
+            <div class="grid two" id="model-cards"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="runner" class="section">
+      <div class="container">
+        <h2>问题跑题器</h2>
+        <p class="section-lead">用五层流程结构化判断真实问题。</p>
+        <div class="card">
+          <form id="runner-form" class="runner-form">
+            <label class="input-group">
+              <span>真实问题</span>
+              <textarea id="runner-problem" required></textarea>
+            </label>
+            <label class="input-group">
+              <span>事实层：确认的事实</span>
+              <textarea id="runner-facts" required></textarea>
+            </label>
+            <label class="input-group">
+              <span>结构层：约束与角色</span>
+              <textarea id="runner-structure" required></textarea>
+            </label>
+            <label class="input-group">
+              <span>模型层：可用模型</span>
+              <textarea id="runner-model" required></textarea>
+            </label>
+            <label class="input-group">
+              <span>反直觉：可能的反例</span>
+              <textarea id="runner-counter" required></textarea>
+            </label>
+            <label class="input-group">
+              <span>自我层：偏差与情绪</span>
+              <textarea id="runner-self" required></textarea>
+            </label>
+            <div class="quiz-actions">
+              <button class="btn primary" type="submit">生成判断报告</button>
+              <button class="btn ghost" type="button" id="save-log">保存到日志</button>
+            </div>
+          </form>
+          <div class="result" id="runner-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="history" class="section soft">
+      <div class="container">
+        <h2>用户档案与记录</h2>
+        <p class="section-lead">历史测评、跑题输出与复盘轨迹。</p>
+        <div class="grid two">
+          <div class="card">
+            <h3>历史测评记录</h3>
+            <div class="log-list" id="result-history"></div>
+          </div>
+          <div class="card">
+            <h3>认知日志</h3>
+            <div class="log-list" id="log-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2>分享</h2>
+        <div class="card wide">
+          <p id="share-text">
+            我完成了认知五层测评并生成认知画像，分享给你看看。
+          </p>
+          <button class="btn ghost" id="copy-text" type="button">复制文案</button>
+          <p class="micro" id="copy-status"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>认知模型 · 从对话沉淀，以判断为核，用行动迭代</p>
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+
+</html>
